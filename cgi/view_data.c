@@ -22,8 +22,8 @@ int main(void)
   html_start("View Data");
 
   printf("<h1>View Data</h1>");
-
-  Product *products = read_products("data_it.csv", &count);
+  const char *filename = "/home/praxis/Desktop/www/DATA/data_it.csv";
+  Product *products = read_products(filename, &count);
 
   display_array(
     products,
