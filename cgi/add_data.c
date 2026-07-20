@@ -2,61 +2,55 @@
 
 int main(void)
 {
-  html_start("Add Product");
+    char *raw = get_user_input();
 
-  // Product product =
-  // {
-  //   11,
-  //   "HP EliteBook 840 G10",
-  //   "Laptop",
-  //   "HP",
-  //   1499.99,
-  //   15
-  // };
+    if (raw == NULL)
+    {
+        html_start("Add Product");
+        printf("<p>Failed to read form data.</p>");
+        html_end();
+        return 1;
+    }
 
-  // if (add_product("/home/praxis/Desktop/www/DATA/data_it.csv", product))
-  // {
-  //   printf("Product added successfully.\n");
-  // }
-  // else
-  // {
-  //   printf("Failed to add product.\n");
-  // }
-  char *raw = get_user_input();
+    char decoded[1024];
+    url_decode(raw, decoded);
 
-if (raw == NULL)
-{
-    /* Handle error */
-    return 1;
-}
+    Product product = {0};
+    char id[20];
+    char price[20];
+    char stock[20];
 
-char decoded[1024];
+    extract_field(decoded, "id", id, sizeof(id));
+    extract_field(decoded, "name", product.name, sizeof(product.name));
+    extract_field(decoded, "category", product.category, sizeof(product.category));
+    extract_field(decoded, "brand", product.brand, sizeof(product.brand));
+    extract_field(decoded, "price", price, sizeof(price));
+    extract_field(decoded, "stock", stock, sizeof(stock));
 
-url_decode(raw, decoded);
+    product.id = atoi(id);
+    product.price = atof(price);
+    product.stock = atoi(stock);
 
-Product product = {0};
+    bool ok = add_product("/home/praxis/Desktop/www/DATA/data_it.csv", product);
 
-char id[20];
-char price[20];
-char stock[20];
+    free(raw);
 
-extract_field(decoded, "id", id, sizeof(id));
-extract_field(decoded, "name", product.name, sizeof(product.name));
-extract_field(decoded, "category", product.category, sizeof(product.category));
-extract_field(decoded, "brand", product.brand, sizeof(product.brand));
-extract_field(decoded, "price", price, sizeof(price));
-extract_field(decoded, "stock", stock, sizeof(stock));
+    if (ok)
+    {
+        /* Success: redirect instead of printing a page.
+           This becomes the browser's "last request" — a safe GET. */
+        printf("Status: 302 Found\r\n");
+        printf("Location: /cgi/view_data.cgi\r\n");
+        printf("\r\n");
+    }
+    else
+    {
+        /* Failure: it's fine to show a page here, since a failed
+           write has no side effect to accidentally repeat. */
+        html_start("Add Product");
+        printf("<p>Failed to add product.</p>");
+        html_end();
+    }
 
-product.id = atoi(id);
-product.price = atof(price);
-product.stock = atoi(stock);
-
-
-
-display_product(product);
-add_product("/home/praxis/Desktop/www/DATA/data_it.csv", product);
-free(raw);
-html_end();
-
-return 0;
+    return 0;
 }
