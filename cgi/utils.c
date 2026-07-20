@@ -107,3 +107,28 @@ Product *read_products(const char *filename, int *count)
 
     return products;
 }
+
+bool add_product(const char *filename, Product product)
+{
+    FILE *file = fopen(filename, "a");
+
+    if (file == NULL)
+    {
+        return false;
+    }
+
+    fprintf(
+        file,
+        "%d,%s,%s,%s,%.2f,%d\n",
+        product.id,
+        product.name,
+        product.category,
+        product.brand,
+        product.price,
+        product.stock
+    );
+
+    fclose(file);
+
+    return true;
+}

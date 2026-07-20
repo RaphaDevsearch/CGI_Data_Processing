@@ -1,9 +1,11 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <stdbool.h>
 #define MAX_NAME      100
 #define MAX_CATEGORY   50
 #define MAX_BRAND      50
+
 
 typedef struct
 {
@@ -20,5 +22,6 @@ void html_start(const char *title);
 void html_end(void);
 Product *read_products(const char *filename, int *count);
 void display_array(Product products[], int count);
+bool add_product(const char *filename, Product product);
 
 #endif
